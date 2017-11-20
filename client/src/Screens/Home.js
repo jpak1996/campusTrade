@@ -28,8 +28,8 @@ import { DrawerNavigator, NavigationActions, StackNavigator } from 'react-naviga
 import Auth from '../../lib/Categories/Auth';
 import Storage from '../../lib/Categories/Storage';
 import API from '../../lib/Categories/API';
-import AddPet from './AddPet';
-import ViewPet from './ViewPet';
+import AddItem from './AddItem';
+import ViewItem from './ViewItem';
 import UploadPhoto from '../Components/UploadPhoto';
 import SideMenuIcon from '../Components/SideMenuIcon';
 import awsmobile from '../../aws-exports';
@@ -41,7 +41,7 @@ class Home extends React.Component {
   constructor(props) {
     super(props);
 
-    this.handleRetrievePet = this.handleRetrievePet.bind(this);
+    this.handleRetrieveItem = this.handleRetrieveItem.bind(this);
     this.animate = this.animate.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
 
@@ -55,7 +55,7 @@ class Home extends React.Component {
   }
 
   componentDidMount() {
-    this.handleRetrievePet();
+    this.handleRetrieveItem();
     this.animate();
   }
 
@@ -72,7 +72,7 @@ class Home extends React.Component {
     ).start();
   }
 
-  handleRetrievePet() {
+  handleRetrieveItem() {
     const cloudLogicArray = JSON.parse(awsmobile.aws_cloud_logic_custom);
     const endPoint = cloudLogicArray[0].endpoint;
     const requestParams = {
@@ -93,31 +93,31 @@ class Home extends React.Component {
 
   toggleModal() {
     if (!this.state.modalVisible) {
-      this.handleRetrievePet();
+      this.handleRetrieveItem();
       this.animate();
     }
 
     this.setState((state) => ({ modalVisible: !state.modalVisible }));
   }
 
-  renderPet(pet, index) {
-    const uri = pet.picKey ? Storage.getObjectUrl(pet.picKey) : null;
+  renderItem(item, index) {
+    const uri = item.picKey ? Storage.getObjectUrl(item.picKey) : null;
 
     return (
       <TouchableHighlight
         onPress={() => {
-          this.props.navigation.navigate('ViewPet', { pet })
+          this.props.navigation.navigate('ViewItem', { item })
         }}
         underlayColor='transparent'
-        key={pet.petId}
+        key={item.petId}
       >
-        <View style={styles.petInfoContainer}>
+        <View style={styles.itemInfoContainer}>
           <Image
             resizeMode='cover'
             source={uri ? { uri } : require('../../assets/images/profileicon.png')}
-            style={styles.petInfoAvatar}
+            style={styles.itemInfoAvatar}
           />
-          <Text style={styles.petInfoName}>{pet.name}</Text>
+        <Text style={styles.itemInfoName}>{item.name}</Text>
         </View>
       </TouchableHighlight>
     )
@@ -130,8 +130,8 @@ class Home extends React.Component {
       outputRange: ['0deg', '360deg'],
     });
 
-    const AddPetRoutes = StackNavigator({
-      AddPet: { screen: AddPet },
+    const AddItemRoutes = StackNavigator({
+      AddItem: { screen: AddItem },
       UploadPhoto: { screen: UploadPhoto },
     });
 
@@ -155,7 +155,7 @@ class Home extends React.Component {
             <View style={styles.container}>
               <Text style={styles.title}>My Items</Text>
               {
-                apiResponse.map((pet, index) => this.renderPet(pet, index))
+                apiResponse.map((item, index) => this.renderItem(item, index))
               }
             </View>
           }
@@ -166,7 +166,7 @@ class Home extends React.Component {
           visible={this.state.modalVisible}
           onRequestClose={this.toggleModal}
         >
-          <AddPetRoutes screenProps={{ handleRetrievePet: this.handleRetrievePet, toggleModal: this.toggleModal }} />
+          <AddItemRoutes screenProps={{ handleRetrieveItem: this.handleRetrieveItem, toggleModal: this.toggleModal }} />
         </Modal>
       </View >
     );
@@ -182,17 +182,17 @@ styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 15,
   },
-  petInfoContainer: {
+  itemInfoContainer: {
     marginVertical: 10,
     flexDirection: 'row',
     alignItems: 'center',
   },
-  petInfoName: {
+  itemInfoName: {
     color: colors.darkGray,
     fontSize: 20,
     marginLeft: 17
   },
-  petInfoAvatar: {
+  itemInfoAvatar: {
     width: 50,
     height: 50,
     borderRadius: 25,
@@ -214,7 +214,7 @@ const HomeRouteStack = {
       }
     }
   },
-  ViewPet: { screen: ViewPet }
+  ViewItem: { screen: ViewItem }
 };
 
 const HomeNav = StackNavigator(HomeRouteStack);

@@ -20,16 +20,16 @@ import {
 import { colors } from 'theme';
 import Storage from '../../lib/Categories/Storage';
 
-class ViewPet extends React.PureComponent {
+class ViewItem extends React.PureComponent {
   static navigationOptions = ({ navigation, screenProps }) => console.log(screenProps) || ({
-    title: `Viewing ${navigation.state.params.pet.name}`,
+    title: `Viewing ${navigation.state.params.item.name}`,
   })
   render() {
-    const { pet } = this.props.navigation.state.params;
+    const { item } = this.props.navigation.state.params;
 
-    const uri = pet.picKey ? Storage.getObjectUrl(pet.picKey) : null;
+    const uri = item.picKey ? Storage.getObjectUrl(item.picKey) : null;
 
-    const dob = new Date(pet.dob);
+    const dob = new Date(item.dob);
     const years = (new Date()).getFullYear() - dob.getFullYear();
     const birthDay = `${years} years old, ${dob.getMonth() + 1}/${dob.getDate()}/${dob.getFullYear()}`;
 
@@ -41,10 +41,10 @@ class ViewPet extends React.PureComponent {
             source={uri ? { uri } : require('../../assets/images/profileicon.png')}
           />
           <View style={styles.infoContainer}>
-            <Text style={styles.title}>{pet.name || 'No name'}</Text>
-            <Text style={styles.info}>{pet.breed || 'No type'}</Text>
-            <Text style={styles.info}>{birthDay}</Text>
-            <Text style={styles.info}>{pet.gender || 'No gender'}</Text>
+            <Text style={styles.title}>{item.name || 'No name'}</Text>
+            <Text style={styles.info}>{'$'+item.price || 'No price'}</Text>
+            <Text style={styles.info}>{item.type || 'No type'}</Text>
+
           </View>
         </View>
         <View style={styles.breaker} />
@@ -86,4 +86,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ViewPet;
+export default ViewItem;
