@@ -49,7 +49,7 @@ const { width, height } = Dimensions.get('window');
 
 let styles = {};
 
-class AddPet extends React.Component {
+class AddItem extends React.Component {
   static navigationOptions = {
     title: 'Add Item',
   }
@@ -58,13 +58,13 @@ class AddPet extends React.Component {
     selectedImage: {},
     selectedImageIndex: null,
     images: [],
-    selectedGenderIndex: null,
+    selectedTypeIndex: null,
     modalVisible: false,
     input: {
       name: '',
       dob: null,
-      breed: '',
-      gender: '',
+      price: '',
+      type: '',
     },
     showActivityIndicator: false,
   }
@@ -134,21 +134,21 @@ class AddPet extends React.Component {
       .then(x => console.log('SAVED', x) || x);
   }
 
-  AddPet = () => {
-    const petInfo = this.state.input;
+  AddItem = () => {
+    const itemInfo = this.state.input;
     const { node: imageNode } = this.state.selectedImage;
 
     this.setState({ showActivityIndicator: true });
 
     this.readImage(imageNode)
       .then(fileInfo => ({
-        ...petInfo,
+        ...itemInfo,
         picKey: fileInfo && fileInfo.key,
       }))
-      .then(this.apiSavePet)
+      .then(this.apiSaveItem)
       .then(data => {
         this.setState({ showActivityIndicator: false });
-        this.props.screenProps.handleRetrievePet();
+        this.props.screenProps.handleRetrieveItem();
         this.props.screenProps.toggleModal();
       })
       .catch(err => {
@@ -157,40 +157,43 @@ class AddPet extends React.Component {
       });
   }
 
-  apiSavePet(pet) {
+  apiSaveItem(item) {
     const cloudLogicArray = JSON.parse(awsmobile.aws_cloud_logic_custom);
     const endPoint = cloudLogicArray[0].endpoint;
     const requestParams = {
       method: 'POST',
       url: endPoint + '/items/pets',
       headers: { 'content-type': 'application/json; charset=utf-8' },
-      body: JSON.stringify(pet),
+      body: JSON.stringify(item),
     }
 
     return API.restRequest(requestParams);
   }
 
-  updateGender = (index) => {
-    let gender = 'female';
-    if (index === this.state.selectedGenderIndex) {
+  updateType = (index) => {
+    let type = 'furniture';
+    if (index === this.state.selectedTypeIndex) {
       index = null;
-      gender = '';
+      type = '';
     }
     else if (index === 1) {
-      gender = 'male';
+      type = 'technology';
+    }
+    else if (index === 2) {
+      type = 'clothes';
     }
     this.setState((state) => ({
-      selectedGenderIndex: index,
+      selectedTypeIndex: index,
       input: {
         ...state.input,
-        gender,
+        type,
       }
     }))
   }
 
 
   render() {
-    const { selectedImageIndex, selectedImage, selectedGenderIndex } = this.state;
+    const { selectedImageIndex, selectedImage, selectedTypeIndex } = this.state;
 
     return (
       <View style={{ flex: 1, paddingBottom: 0 }}>
@@ -229,15 +232,8 @@ class AddPet extends React.Component {
             onChangeText={(name) => this.updateInput('name', name)}
             value={this.state.input.name}
           />
-          <FormLabel>Date Of Birth</FormLabel>
-          <DatePicker
-            inputStyle={styles.input}
-            selectionColor={colors.primary}
-            value={this.state.input.dob}
-            ref="datepicker"
-            onDateChange={date => this.updateInput('dob', date)}>
-          </DatePicker>
-          <FormLabel>Type</FormLabel>
+          <FormLabel>Price</FormLabel>
+          
           <FormInput
             inputStyle={styles.input}
             selectionColor={colors.primary}
@@ -245,14 +241,15 @@ class AddPet extends React.Component {
             autoCorrect={false}
             underlineColorAndroid="transparent"
             editable={true}
-            placeholder="Please enter your item type"
+            placeholder="Please enter your item price"
             returnKeyType="next"
-            ref="breed"
-            textInputRef="breedInput"
-            onChangeText={(breed) => this.updateInput('breed', breed)}
-            value={this.state.input.breed}
+            ref="price"
+            textInputRef="priceInput"
+            onChangeText={(price) => this.updateInput('price', price)}
+            value={this.state.input.price}
           />
-          <FormLabel>Gender</FormLabel>
+
+          <FormLabel>Type</FormLabel>
           <View style={styles.buttonGroupContainer}>
             <ButtonGroup
               innerBorderStyle={{ width: 0.5 }}
@@ -260,9 +257,9 @@ class AddPet extends React.Component {
               containerStyle={{ borderColor: '#d0d0d0' }}
               selectedTextStyle={{ color: 'white', fontFamily: 'lato' }}
               selectedBackgroundColor={colors.primary}
-              onPress={this.updateGender}
-              selectedIndex={this.state.selectedGenderIndex}
-              buttons={['female', 'male']}
+              onPress={this.updateType}
+              selectedIndex={this.state.selectedTypeIndex}
+              buttons={['furniture', 'technology', 'clothes']}
             />
           </View>
           <Button
@@ -271,7 +268,7 @@ class AddPet extends React.Component {
             backgroundColor={colors.primary}
             large
             title="Add Item"
-            onPress={this.AddPet}
+            onPress={this.AddItem}
           />
           <Text
             onPress={this.props.screenProps.toggleModal}
@@ -335,4 +332,4 @@ styles = StyleSheet.create({
   },
 });
 
-export default AddPet;
+export default AddItem;
