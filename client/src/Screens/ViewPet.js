@@ -42,7 +42,7 @@ class ViewPet extends React.PureComponent {
           />
           <View style={styles.infoContainer}>
             <Text style={styles.title}>{pet.name || 'No name'}</Text>
-            <Text style={styles.info}>{pet.breed || 'No breed'}</Text>
+            <Text style={styles.info}>{pet.breed || 'No type'}</Text>
             <Text style={styles.info}>{birthDay}</Text>
             <Text style={styles.info}>{pet.gender || 'No gender'}</Text>
           </View>

@@ -51,7 +51,7 @@ let styles = {};
 
 class AddPet extends React.Component {
   static navigationOptions = {
-    title: 'Add Pet',
+    title: 'Add Item',
   }
 
   state = {
@@ -152,7 +152,7 @@ class AddPet extends React.Component {
         this.props.screenProps.toggleModal();
       })
       .catch(err => {
-        console.log('error saving pet...', err);
+        console.log('error saving item...', err);
         this.setState({ showActivityIndicator: false });
       });
   }
@@ -195,7 +195,7 @@ class AddPet extends React.Component {
     return (
       <View style={{ flex: 1, paddingBottom: 0 }}>
         <ScrollView style={{ flex: 1 }}>
-          <Text style={styles.title}>Add New Pet</Text>
+          <Text style={styles.title}>Add New Item</Text>
           <TouchableWithoutFeedback
             onPress={this.getPhotos}
           >
@@ -222,7 +222,7 @@ class AddPet extends React.Component {
             autoCorrect={false}
             underlineColorAndroid="transparent"
             editable={true}
-            placeholder="Please enter you pet's name"
+            placeholder="Please enter your item's name"
             returnKeyType="next"
             ref="name"
             textInputRef="nameInput"
@@ -237,7 +237,7 @@ class AddPet extends React.Component {
             ref="datepicker"
             onDateChange={date => this.updateInput('dob', date)}>
           </DatePicker>
-          <FormLabel>Breed</FormLabel>
+          <FormLabel>Type</FormLabel>
           <FormInput
             inputStyle={styles.input}
             selectionColor={colors.primary}
@@ -245,7 +245,7 @@ class AddPet extends React.Component {
             autoCorrect={false}
             underlineColorAndroid="transparent"
             editable={true}
-            placeholder="Please enter your pet's breed"
+            placeholder="Please enter your item type"
             returnKeyType="next"
             ref="breed"
             textInputRef="breedInput"
@@ -270,7 +270,7 @@ class AddPet extends React.Component {
             containerViewStyle={{ marginTop: 20 }}
             backgroundColor={colors.primary}
             large
-            title="Add Pet"
+            title="Add Item"
             onPress={this.AddPet}
           />
           <Text

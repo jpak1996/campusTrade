@@ -11,5 +11,5 @@
  * and limitations under the License.
  */
 export default {
-  APP_NAME: 'Pet Tracker',
+  APP_NAME: 'Campus Trade',
 };

@@ -153,7 +153,7 @@ class Home extends React.Component {
           {
             !loading &&
             <View style={styles.container}>
-              <Text style={styles.title}>My Pets</Text>
+              <Text style={styles.title}>My Items</Text>
               {
                 apiResponse.map((pet, index) => this.renderPet(pet, index))
               }
