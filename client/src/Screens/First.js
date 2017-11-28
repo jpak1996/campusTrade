@@ -34,7 +34,7 @@ const FirstScreen = TabNavigator({
         <SignIn
           { ...screenProps }
           { ...otherProps }
-          onLogIn={() => screenProps.rootNavigator.navigate('Home')}
+          onLogIn={() => screenProps.rootNavigator.navigate('Sell')}
         />
       );
     },

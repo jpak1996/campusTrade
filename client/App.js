@@ -19,17 +19,21 @@ import { WithAuth } from './lib/Categories/Auth/Components';
 
 import First from './src/Screens/First';
 import Splash from './src/Screens/Splash';
-import Home from './src/Screens/Home';
+import Sell from './src/Screens/Sell';
+import Buy from './src/Screens/Buy';
 import SignOut from './src/Components/SignOut';
 import ForgotPassword from './src/Components/ForgotPassword';
 
 const App = DrawerNavigator({
-  Home: {
-    screen: props => <Home rootNavigator={props.navigation} {...props.screenProps } />,
+  Sell: {
+    screen: props => <Sell rootNavigator={props.navigation} {...props.screenProps } />,
+  },
+  Buy: {
+    screen: props => <Buy rootNavigator={props.navigation} {...props.screenProps } />,
   },
   ForgotPassword: {
     screen: (props) => {
-      return <ForgotPassword {...props.screenProps} onCancel={() => props.navigation.navigate('Home')} onSuccess={() => props.navigation.navigate('Home')} />
+      return <ForgotPassword {...props.screenProps} onCancel={() => props.navigation.navigate('Sell')} onSuccess={() => props.navigation.navigate('Sell')} />
     }, navigationOptions: { drawerLabel: 'Change password' }
   },
   SignOut: {

@@ -37,7 +37,7 @@ import { colors } from 'theme';
 
 let styles = {};
 
-class Home extends React.Component {
+class Sell extends React.Component {
   constructor(props) {
     super(props);
 
@@ -201,15 +201,15 @@ styles = StyleSheet.create({
 
 
 
-const HomeRouteStack = {
-  Home: {
+const SellRouteStack = {
+  Sell: {
     screen: (props) => {
       const { screenProps, ...otherProps } = props;
-      return <Home {...props.screenProps} {...otherProps} />
+      return <Sell {...props.screenProps} {...otherProps} />
     },
     navigationOptions: (props) => {
       return {
-        title: 'Home',
+        title: 'Sell',
         headerLeft: <SideMenuIcon onPress={() => props.screenProps.rootNavigator.navigate('DrawerOpen')} />,
       }
     }
@@ -217,10 +217,10 @@ const HomeRouteStack = {
   ViewItem: { screen: ViewItem }
 };
 
-const HomeNav = StackNavigator(HomeRouteStack);
+const SellNav = StackNavigator(SellRouteStack);
 
 export default (props) => {
   const { screenProps, rootNavigator, ...otherProps } = props;
 
-  return <HomeNav screenProps={{ rootNavigator, ...screenProps, ...otherProps }} />
+  return <SellNav screenProps={{ rootNavigator, ...screenProps, ...otherProps }} />
 };

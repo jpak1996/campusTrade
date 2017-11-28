@@ -58,7 +58,7 @@ class Splash extends React.Component {
 
     this.setState({ isLoading: false });
 
-    this._navigateTo(loggedIn ? 'Home' : 'FirstScreen');
+    this._navigateTo(loggedIn ? 'Sell' : 'FirstScreen');
 
   }
 
