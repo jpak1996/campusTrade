@@ -96,6 +96,20 @@ class Buy extends React.Component {
     };
 
     API.restRequest(requestParams).then(apiResponse => {
+      alert(JSON.stringify(apiResponse))
+      apiResponse.sort(function(a, b) {
+        var nameA = a.name.toUpperCase(); // ignore upper and lowercase
+        var nameB = b.name.toUpperCase(); // ignore upper and lowercase
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+
+        // names must be equal
+        return 0;
+      });
       this.setState({ apiResponse, loading: false });
     }).catch(e => {
       this.setState({ apiResponse: e.message, loading: false });
@@ -117,7 +131,7 @@ class Buy extends React.Component {
 
   renderItem(item, index) {
     const uri = item.picKey ? Storage.getObjectUrl(item.picKey) : null;
-
+    //if (item.type == "technology") {
     return (
       <TouchableHighlight
         onPress={() => {
@@ -132,10 +146,11 @@ class Buy extends React.Component {
             source={uri ? { uri } : require('../../assets/images/profileicon.png')}
             style={styles.itemInfoAvatar}
           />
-        <Text style={styles.itemInfoName}>{item.name}</Text>
+        <Text style={styles.itemInfoName}>{item.name} - {item.type}</Text>
         </View>
       </TouchableHighlight>
     )
+  //}
   }
 
   render() {
@@ -150,25 +165,40 @@ class Buy extends React.Component {
       UploadPhoto: { screen: UploadPhoto },
     });
 
-    return (
-      <View style={{ flex: 1, paddingBottom: 0 }}>
-        <ScrollView style={{ flex: 1 }}>
-
-          <FormLabel>Type</FormLabel>
-          <View style={styles.buttonGroupContainer}>
-            <ButtonGroup
-              innerBorderStyle={{ width: 0.5 }}
-              underlayColor='#0c95de'
-              containerStyle={{ borderColor: '#d0d0d0' }}
-              selectedTextStyle={{ color: 'white', fontFamily: 'lato' }}
-              selectedBackgroundColor={colors.primary}
-              onPress={this.updateType}
-              selectedIndex={this.state.selectedTypeIndex}
-              buttons={['furniture', 'technology', 'clothes']}
-            />
-          </View>
+        return (
+      <View style={[{ flex: 1 }]}>
+        {!loading && <View style={{ position: 'absolute', bottom: 25, right: 25, zIndex: 1 }}>
+          <Icon
+            onPress={this.toggleModal}
+            raised
+            reverse
+            name='add'
+            size={44}
+            containerStyle={{ width: 50, height: 50 }}
+            color={colors.primary}
+          />
+        </View>}
+        <ScrollView style={[{ flex: 1, zIndex: 0 }]} contentContainerStyle={[loading && { justifyContent: 'center', alignItems: 'center' }]}>
+          {loading && <Animated.View style={{ transform: [{ rotate: spin }] }}><Icon name='autorenew' color={colors.grayIcon} /></Animated.View>}
+          {
+            !loading &&
+            <View style={styles.container}>
+              <Text style={styles.title}>Available Items</Text>
+              {
+                apiResponse.map((item, index) => this.renderItem(item, index))
+              }
+            </View>
+          }
         </ScrollView>
-      </View>
+        <Modal
+          animationType={"slide"}
+          transparent={false}
+          visible={this.state.modalVisible}
+          onRequestClose={this.toggleModal}
+        >
+          <AddItemRoutes screenProps={{ handleRetrieveItem: this.handleRetrieveItem, toggleModal: this.toggleModal }} />
+        </Modal>
+      </View >
     );
   }
 };
@@ -224,3 +254,99 @@ export default (props) => {
 
   return <BuyNav screenProps={{ rootNavigator, ...screenProps, ...otherProps }} />
 };
+
+
+//     return (
+//       <View style={{ flex: 1, paddingBottom: 0 }}>
+//         <ScrollView style={{ flex: 1 }}>
+
+//           <FormLabel>Type</FormLabel>
+//           <View style={styles.buttonGroupContainer}>
+//           <Button
+//             fontFamily='lato'
+//             containerViewStyle={{ marginTop: 20 }}
+//             backgroundColor={colors.primary}
+//             large
+//             title="Furniture"
+//             onPress={() => {
+//               this.props.navigation.navigate('ViewItems')
+//             }}
+//           />
+//           <Button
+//             fontFamily='lato'
+//             containerViewStyle={{ marginTop: 20 }}
+//             backgroundColor={colors.primary}
+//             large
+//             title="Technology"
+//             onPress={() => {
+//               this.props.navigation.navigate('ViewItems')
+//             }}
+//           />
+//           <Button
+//             fontFamily='lato'
+//             containerViewStyle={{ marginTop: 20 }}
+//             backgroundColor={colors.primary}
+//             large
+//             title="Clothes"
+//             onPress={() => {
+//               this.props.navigation.navigate('ViewItems')
+//             }}
+//           />
+//           </View>
+//         </ScrollView>
+//       </View>
+//     );
+//   }
+// };
+
+// styles = StyleSheet.create({
+//   container: {
+//     padding: 25,
+//   },
+//   title: {
+//     color: colors.darkGray,
+//     fontSize: 18,
+//     marginBottom: 15,
+//   },
+//   itemInfoContainer: {
+//     marginVertical: 10,
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   itemInfoName: {
+//     color: colors.darkGray,
+//     fontSize: 20,
+//     marginLeft: 17
+//   },
+//   itemInfoAvatar: {
+//     width: 50,
+//     height: 50,
+//     borderRadius: 25,
+//   }
+// })
+
+
+
+// const BuyRouteStack = {
+//   Buy: {
+//     screen: (props) => {
+//       const { screenProps, ...otherProps } = props;
+//       return <Buy {...props.screenProps} {...otherProps} />
+//     },
+//     navigationOptions: (props) => {
+//       return {
+//         title: 'Buy',
+//         headerLeft: <SideMenuIcon onPress={() => props.screenProps.rootNavigator.navigate('DrawerOpen')} />,
+//       }
+//     }
+//   },
+//   ViewItem: { screen: ViewItem }
+// };
+
+// const BuyNav = StackNavigator(BuyRouteStack);
+
+// export default (props) => {
+//   const { screenProps, rootNavigator, ...otherProps } = props;
+
+//   return <BuyNav screenProps={{ rootNavigator, ...screenProps, ...otherProps }} />
+// };
