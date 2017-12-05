@@ -13,69 +13,246 @@
 import React from 'react';
 import {
   View,
+  ScrollView,
   Text,
+  Animated,
   StyleSheet,
   Image,
+  Easing,
+  TouchableHighlight
 } from 'react-native';
-import { colors } from 'theme';
+import { Button, ButtonGroup, Icon } from 'react-native-elements';
+
+import {
+  CameraRoll,
+  TouchableWithoutFeedback,
+  Modal,
+  Dimensions,
+  ImageStore,
+  Platform,
+  ActivityIndicator
+} from 'react-native';
+import {
+  FormLabel,
+  FormInput,
+  FormValidationMessage
+} from 'react-native-elements';
+
+import { DrawerNavigator, NavigationActions, StackNavigator } from 'react-navigation';
+
+import Auth from '../../lib/Categories/Auth';
 import Storage from '../../lib/Categories/Storage';
+import API from '../../lib/Categories/API';
+import AddItem from './AddItem';
+import ViewItem from './ViewItem';
+import UploadPhoto from '../Components/UploadPhoto';
+import SideMenuIcon from '../Components/SideMenuIcon';
+import awsmobile from '../../aws-exports';
+import { colors } from 'theme';
 
-class ViewItems extends React.PureComponent {
-  static navigationOptions = ({ navigation, screenProps }) => console.log(screenProps) || ({
-    title: `Viewing Test`,
-  })
-  render() {
-    return (
-      <View style={styles.container}>
-        <View style={styles.topContainer}>
-          <Image
-            style={styles.image}
-            source={uri ? { uri } : require('../../assets/images/profileicon.png')}
-          />
-          <View style={styles.infoContainer}>
-            <Text style={styles.title}>{'No name'}</Text>
-            <Text style={styles.info}>{'No price'}</Text>
-            <Text style={styles.info}>{'No type'}</Text>
+let styles = {};
 
+class ViewItems extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.handleRetrieveItem = this.handleRetrieveItem.bind(this);
+    this.animate = this.animate.bind(this);
+    this.toggleModal = this.toggleModal.bind(this);
+
+    this.animatedIcon = new Animated.Value(0);
+
+    this.state = {
+      apiResponse: null,
+      loading: true,
+      modalVisible: false,
+    }
+  }
+
+  componentDidMount() {
+    this.handleRetrieveItem();
+    this.animate();
+  }
+
+  animate() {
+    Animated.loop(
+      Animated.timing(
+        this.animatedIcon,
+        {
+          toValue: 1,
+          duration: 1300,
+          easing: Easing.linear,
+        }
+      )
+    ).start();
+  }
+
+  handleRetrieveItem() {
+    const cloudLogicArray = JSON.parse(awsmobile.aws_cloud_logic_custom);
+    const endPoint = cloudLogicArray[0].endpoint;
+    const requestParams = {
+      method: 'GET',
+      url: endPoint + '/items/pets',
+    };
+
+    API.restRequest(requestParams).then(apiResponse => {
+      apiResponse.sort(function(a, b) {
+        var nameA = a.name.toUpperCase(); // ignore upper and lowercase
+        var nameB = b.name.toUpperCase(); // ignore upper and lowercase
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+
+        // names must be equal
+        return 0;
+      });
+      this.setState({ apiResponse, loading: false });
+    }).catch(e => {
+      this.setState({ apiResponse: e.message, loading: false });
+    });
+  }
+
+  openDrawer = () => {
+    this.props.navigation.navigate('DrawerOpen');
+  }
+
+  toggleModal() {
+    if (!this.state.modalVisible) {
+      this.handleRetrieveItem();
+      this.animate();
+    }
+
+    this.setState((state) => ({ modalVisible: !state.modalVisible }));
+  }
+
+  renderItem(item, index, typename) {
+    const uri = item.picKey ? Storage.getObjectUrl(item.picKey) : null;
+    if (item.type == typename) {
+      return (
+        <TouchableHighlight
+          onPress={() => {
+            this.props.navigation.navigate('ViewItem', { item })
+          }}
+          underlayColor='transparent'
+          key={item.petId}
+        >
+          <View style={styles.itemInfoContainer}>
+            <Image
+              resizeMode='cover'
+              source={uri ? { uri } : require('../../assets/images/profileicon.png')}
+              style={styles.itemInfoAvatar}
+            />
+          <Text style={styles.itemInfoName}>{item.name} - {item.type}</Text>
           </View>
-        </View>
-        <View style={styles.breaker} />
-      </View>
+        </TouchableHighlight>
+      )
+    }
+  }
+
+  render() {
+    const { type } = this.props.navigation.state.params;
+    const { loading, apiResponse } = this.state;
+    const spin = this.animatedIcon.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['0deg', '360deg'],
+    });
+
+    const AddItemRoutes = StackNavigator({
+      AddItem: { screen: AddItem },
+      UploadPhoto: { screen: UploadPhoto },
+    });
+
+        return (
+      <View style={[{ flex: 1 }]}>
+        {!loading && <View style={{ position: 'absolute', bottom: 25, right: 25, zIndex: 1 }}>
+          <Icon
+            onPress={this.toggleModal}
+            raised
+            reverse
+            name='add'
+            size={44}
+            containerStyle={{ width: 50, height: 50 }}
+            color={colors.primary}
+          />
+        </View>}
+        <ScrollView style={[{ flex: 1, zIndex: 0 }]} contentContainerStyle={[loading && { justifyContent: 'center', alignItems: 'center' }]}>
+          {loading && <Animated.View style={{ transform: [{ rotate: spin }] }}><Icon name='autorenew' color={colors.grayIcon} /></Animated.View>}
+          {
+            !loading &&
+            <View style={styles.container}>
+              <Text style={styles.title}>Available Items</Text>
+              {
+                apiResponse.map((item, index) => this.renderItem(item, index, type.type))
+              }
+            </View>
+          }
+        </ScrollView>
+        <Modal
+          animationType={"slide"}
+          transparent={false}
+          visible={this.state.modalVisible}
+          onRequestClose={this.toggleModal}
+        >
+          <AddItemRoutes screenProps={{ handleRetrieveItem: this.handleRetrieveItem, toggleModal: this.toggleModal }} />
+        </Modal>
+      </View >
     );
   }
-}
+};
 
-const imageSize = 130;
-const styles = StyleSheet.create({
-  infoContainer: {
-    paddingLeft: 20,
-  },
-  breaker: {
-    height: 1,
-    backgroundColor: colors.darkGray,
-    marginVertical: 15,
-    width: '100%',
-  },
-  topContainer: {
-    flexDirection: 'row',
-  },
+styles = StyleSheet.create({
   container: {
-    padding: 20,
-  },
-  image: {
-    width: imageSize,
-    height: imageSize,
-    borderRadius: imageSize / 2,
+    padding: 25,
   },
   title: {
     color: colors.darkGray,
-    fontSize: 28,
-    marginBottom: 20,
+    fontSize: 18,
+    marginBottom: 15,
   },
-  info: {
+  itemInfoContainer: {
+    marginVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  itemInfoName: {
     color: colors.darkGray,
-    marginBottom: 7,
+    fontSize: 20,
+    marginLeft: 17
   },
-});
+  itemInfoAvatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  }
+})
+
+
+
+const ViewItemsRouteStack = {
+  ViewItems: {
+    screen: (props) => {
+      const { screenProps, ...otherProps } = props;
+      return <ViewItems {...props.screenProps} {...otherProps} />
+    },
+    navigationOptions: (props) => {
+      return {
+        title: 'ViewItems',
+        headerLeft: <SideMenuIcon onPress={() => props.screenProps.rootNavigator.navigate('DrawerOpen')} />,
+      }
+    }
+  },
+  ViewItem: { screen: ViewItem }
+};
+
+const ViewItemsNav = StackNavigator(ViewItemsRouteStack);
+
+// export default (props) => {
+//   const { screenProps, rootNavigator, ...otherProps } = props;
+
+//   return <ViewItemsNav screenProps={{ rootNavigator, ...screenProps, ...otherProps }} />
+// };
 
 export default ViewItems;

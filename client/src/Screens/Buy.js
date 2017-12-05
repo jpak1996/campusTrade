@@ -45,6 +45,7 @@ import Storage from '../../lib/Categories/Storage';
 import API from '../../lib/Categories/API';
 import AddItem from './AddItem';
 import ViewItem from './ViewItem';
+import ViewItems from './ViewItems';
 import UploadPhoto from '../Components/UploadPhoto';
 import SideMenuIcon from '../Components/SideMenuIcon';
 import awsmobile from '../../aws-exports';
@@ -96,7 +97,7 @@ class Buy extends React.Component {
     };
 
     API.restRequest(requestParams).then(apiResponse => {
-      alert(JSON.stringify(apiResponse))
+      //alert(JSON.stringify(apiResponse))
       apiResponse.sort(function(a, b) {
         var nameA = a.name.toUpperCase(); // ignore upper and lowercase
         var nameB = b.name.toUpperCase(); // ignore upper and lowercase
@@ -131,6 +132,7 @@ class Buy extends React.Component {
 
   renderItem(item, index) {
     const uri = item.picKey ? Storage.getObjectUrl(item.picKey) : null;
+
     //if (item.type == "technology") {
     return (
       <TouchableHighlight
@@ -165,40 +167,50 @@ class Buy extends React.Component {
       UploadPhoto: { screen: UploadPhoto },
     });
 
-        return (
-      <View style={[{ flex: 1 }]}>
-        {!loading && <View style={{ position: 'absolute', bottom: 25, right: 25, zIndex: 1 }}>
-          <Icon
-            onPress={this.toggleModal}
-            raised
-            reverse
-            name='add'
-            size={44}
-            containerStyle={{ width: 50, height: 50 }}
-            color={colors.primary}
+    //const item = {"type": "clothes"}
+
+    return (
+      <View style={{ flex: 1, paddingBottom: 0 }}>
+        <ScrollView style={{ flex: 1 }}>
+
+          <FormLabel>Type</FormLabel>
+          <View style={styles.buttonGroupContainer}>
+          <Button
+            fontFamily='lato'
+            containerViewStyle={{ marginTop: 20 }}
+            backgroundColor={colors.primary}
+            large
+            title="Furniture"
+            onPress={() => {
+              const type = {"type": "furniture"}
+              this.props.navigation.navigate('ViewItems', { type })
+            }}
           />
-        </View>}
-        <ScrollView style={[{ flex: 1, zIndex: 0 }]} contentContainerStyle={[loading && { justifyContent: 'center', alignItems: 'center' }]}>
-          {loading && <Animated.View style={{ transform: [{ rotate: spin }] }}><Icon name='autorenew' color={colors.grayIcon} /></Animated.View>}
-          {
-            !loading &&
-            <View style={styles.container}>
-              <Text style={styles.title}>Available Items</Text>
-              {
-                apiResponse.map((item, index) => this.renderItem(item, index))
-              }
-            </View>
-          }
+          <Button
+            fontFamily='lato'
+            containerViewStyle={{ marginTop: 20 }}
+            backgroundColor={colors.primary}
+            large
+            title="Technology"
+            onPress={() => {
+              const type = {"type": "technology"}
+              this.props.navigation.navigate('ViewItems', { type })
+            }}
+          />
+          <Button
+            fontFamily='lato'
+            containerViewStyle={{ marginTop: 20 }}
+            backgroundColor={colors.primary}
+            large
+            title="Clothes"
+            onPress={() => {
+              const type = {"type": "clothes"}
+              this.props.navigation.navigate('ViewItems', { type })
+            }}
+          />
+          </View>
         </ScrollView>
-        <Modal
-          animationType={"slide"}
-          transparent={false}
-          visible={this.state.modalVisible}
-          onRequestClose={this.toggleModal}
-        >
-          <AddItemRoutes screenProps={{ handleRetrieveItem: this.handleRetrieveItem, toggleModal: this.toggleModal }} />
-        </Modal>
-      </View >
+      </View>
     );
   }
 };
@@ -244,7 +256,8 @@ const BuyRouteStack = {
       }
     }
   },
-  ViewItem: { screen: ViewItem }
+  ViewItem: { screen: ViewItem },
+  ViewItems: { screen: ViewItems }
 };
 
 const BuyNav = StackNavigator(BuyRouteStack);
@@ -254,99 +267,3 @@ export default (props) => {
 
   return <BuyNav screenProps={{ rootNavigator, ...screenProps, ...otherProps }} />
 };
-
-
-//     return (
-//       <View style={{ flex: 1, paddingBottom: 0 }}>
-//         <ScrollView style={{ flex: 1 }}>
-
-//           <FormLabel>Type</FormLabel>
-//           <View style={styles.buttonGroupContainer}>
-//           <Button
-//             fontFamily='lato'
-//             containerViewStyle={{ marginTop: 20 }}
-//             backgroundColor={colors.primary}
-//             large
-//             title="Furniture"
-//             onPress={() => {
-//               this.props.navigation.navigate('ViewItems')
-//             }}
-//           />
-//           <Button
-//             fontFamily='lato'
-//             containerViewStyle={{ marginTop: 20 }}
-//             backgroundColor={colors.primary}
-//             large
-//             title="Technology"
-//             onPress={() => {
-//               this.props.navigation.navigate('ViewItems')
-//             }}
-//           />
-//           <Button
-//             fontFamily='lato'
-//             containerViewStyle={{ marginTop: 20 }}
-//             backgroundColor={colors.primary}
-//             large
-//             title="Clothes"
-//             onPress={() => {
-//               this.props.navigation.navigate('ViewItems')
-//             }}
-//           />
-//           </View>
-//         </ScrollView>
-//       </View>
-//     );
-//   }
-// };
-
-// styles = StyleSheet.create({
-//   container: {
-//     padding: 25,
-//   },
-//   title: {
-//     color: colors.darkGray,
-//     fontSize: 18,
-//     marginBottom: 15,
-//   },
-//   itemInfoContainer: {
-//     marginVertical: 10,
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//   },
-//   itemInfoName: {
-//     color: colors.darkGray,
-//     fontSize: 20,
-//     marginLeft: 17
-//   },
-//   itemInfoAvatar: {
-//     width: 50,
-//     height: 50,
-//     borderRadius: 25,
-//   }
-// })
-
-
-
-// const BuyRouteStack = {
-//   Buy: {
-//     screen: (props) => {
-//       const { screenProps, ...otherProps } = props;
-//       return <Buy {...props.screenProps} {...otherProps} />
-//     },
-//     navigationOptions: (props) => {
-//       return {
-//         title: 'Buy',
-//         headerLeft: <SideMenuIcon onPress={() => props.screenProps.rootNavigator.navigate('DrawerOpen')} />,
-//       }
-//     }
-//   },
-//   ViewItem: { screen: ViewItem }
-// };
-
-// const BuyNav = StackNavigator(BuyRouteStack);
-
-// export default (props) => {
-//   const { screenProps, rootNavigator, ...otherProps } = props;
-
-//   return <BuyNav screenProps={{ rootNavigator, ...screenProps, ...otherProps }} />
-// };
