@@ -168,15 +168,6 @@ class ViewItems extends React.Component {
         return (
       <View style={[{ flex: 1 }]}>
         {!loading && <View style={{ position: 'absolute', bottom: 25, right: 25, zIndex: 1 }}>
-          <Icon
-            onPress={this.toggleModal}
-            raised
-            reverse
-            name='add'
-            size={44}
-            containerStyle={{ width: 50, height: 50 }}
-            color={colors.primary}
-          />
         </View>}
         <ScrollView style={[{ flex: 1, zIndex: 0 }]} contentContainerStyle={[loading && { justifyContent: 'center', alignItems: 'center' }]}>
           {loading && <Animated.View style={{ transform: [{ rotate: spin }] }}><Icon name='autorenew' color={colors.grayIcon} /></Animated.View>}
@@ -190,14 +181,6 @@ class ViewItems extends React.Component {
             </View>
           }
         </ScrollView>
-        <Modal
-          animationType={"slide"}
-          transparent={false}
-          visible={this.state.modalVisible}
-          onRequestClose={this.toggleModal}
-        >
-          <AddItemRoutes screenProps={{ handleRetrieveItem: this.handleRetrieveItem, toggleModal: this.toggleModal }} />
-        </Modal>
       </View >
     );
   }
