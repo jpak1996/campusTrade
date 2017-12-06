@@ -33,6 +33,8 @@ class ViewItemBuy extends React.PureComponent {
     const years = (new Date()).getFullYear() - dob.getFullYear();
     const birthDay = `${years} years old, ${dob.getMonth() + 1}/${dob.getDate()}/${dob.getFullYear()}`;
 
+    var arr = Math.floor(2000000000 + Math.random() * 8000000000).toString().split(''); arr.splice(3, 0, '-'); arr.splice(7, 0, '-');
+
     return (
       <View style={styles.container}>
         <View style={styles.topContainer}>
@@ -44,6 +46,7 @@ class ViewItemBuy extends React.PureComponent {
             <Text style={styles.title}>{item.name || 'No name'}</Text>
             <Text style={styles.info}>{'$'+item.price || 'No price'}</Text>
             <Text style={styles.info}>{item.type || 'No type'}</Text>
+            <Text style={styles.info}>{arr.join('')}</Text>
 
           </View>
         </View>
