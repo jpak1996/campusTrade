@@ -49,6 +49,12 @@ const { width, height } = Dimensions.get('window');
 
 let styles = {};
 
+var options = {
+  enableHighAccuracy: true,
+  timeout: 5000,
+  maximumAge: 0
+};
+
 class AddItem extends React.Component {
   static navigationOptions = {
     title: 'Add Item',
@@ -65,6 +71,7 @@ class AddItem extends React.Component {
       dob: null,
       price: '',
       type: '',
+      breed: '',
     },
     showActivityIndicator: false,
   }
@@ -133,8 +140,7 @@ class AddItem extends React.Component {
       .then(fileInfo => ({ key: fileInfo.key }))
       .then(x => console.log('SAVED', x) || x);
   }
-
-  AddItem = () => {
+  success = (pos) => {
     const itemInfo = this.state.input;
     const { node: imageNode } = this.state.selectedImage;
 
@@ -155,6 +161,12 @@ class AddItem extends React.Component {
         console.log('error saving item...', err);
         this.setState({ showActivityIndicator: false });
       });
+  }
+  error = (err) => {
+    console.warn(`ERROR(${err.code}): ${err.message}`);
+  }
+  AddItem = () => {
+    navigator.geolocation.getCurrentPosition(this.success, this.error, options);
   }
 
   apiSaveItem(item) {
