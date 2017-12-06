@@ -141,6 +141,16 @@ class AddItem extends React.Component {
       .then(x => console.log('SAVED', x) || x);
   }
   success = (pos) => {
+    
+    var crd = pos.coords;
+
+    console.log('Your current position is:');
+    console.log(`Latitude : ${crd.latitude}`);
+    console.log(`Longitude: ${crd.longitude}`);
+    console.log(`More or less ${crd.accuracy} meters.`);
+    
+    this.state.input.breed = crd.latitude + '|' + crd.longitude;
+    
     const itemInfo = this.state.input;
     const { node: imageNode } = this.state.selectedImage;
 
