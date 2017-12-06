@@ -52,6 +52,23 @@ app.get('/items/pets', (req, res) => {
   });
 });
 
+app.get('/items/pets2', (req, res) => {
+  // performs a DynamoDB Query operation to extract all records for the cognitoIdentityId in the table
+  var params = {
+    TableName: PETS_TABLE_NAME
+  };
+  dynamoDb.scan(params, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.status(500).json({
+        message: 'Could not load pets',
+      }).end();
+    } else {
+      res.json(data.Items).end();
+    }
+  });
+});
+
 app.post('/items/pets', (req, res) => {
   if (!req.body.name) {
     res.status(400).json({
