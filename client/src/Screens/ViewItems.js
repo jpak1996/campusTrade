@@ -52,6 +52,8 @@ import { colors } from 'theme';
 
 let styles = {};
 
+let nameLocationMap = {}
+
 class ViewItems extends React.Component {
   constructor(props) {
     super(props);
@@ -61,8 +63,6 @@ class ViewItems extends React.Component {
     this.toggleModal = this.toggleModal.bind(this);
 
     this.animatedIcon = new Animated.Value(0);
-
-    this.nameLocationMap = {}
 
     this.state = {
       apiResponse: null,
@@ -98,6 +98,7 @@ class ViewItems extends React.Component {
     };
 
     API.restRequest(requestParams).then(apiResponse => {
+        //alert(JSON.stringify(apiResponse))
 
           /**
            * Round number (value) to a certain number of decimals (decimals)
@@ -177,29 +178,34 @@ class ViewItems extends React.Component {
 
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          alert(position.coords.latitude)
-          alert(position.coords.longitude)
           for (i in apiResponse) {
-            var p1 = new LatLon(34.0, -118.0);
-            var curr = new LatLon(position.coords.latitude, position.coords.longitude)
-            var d = curr.distanceTo(p1)
-            this.nameLocationMap[apiResponse[i].name] = d;
+            if (apiResponse[i].breed === undefined) {
+              nameLocationMap[apiResponse[i].name] = 0;
+            } else {
+              var arr = apiResponse[i].breed.split('|');
+              var lat = parseFloat(arr[0]);
+              var lon = parseFloat(arr[1]);
+              var p1 = new LatLon(lat, lon);
+              var curr = new LatLon(position.coords.latitude, position.coords.longitude);
+              var d = curr.distanceTo(p1);
+              nameLocationMap[apiResponse[i].name] = d;
+            }
           }
 
-        apiResponse.sort(function(a, b) {
-          var nameA = a.name.toUpperCase(); // ignore upper and lowercase
-          var nameB = b.name.toUpperCase(); // ignore upper and lowercase
-          if (nameA < nameB) {
-            return -1;
-          }
-          if (nameA > nameB) {
-            return 1;
-          }
+          apiResponse.sort(function(a, b) {
+          // var nameA = a.name.toUpperCase(); // ignore upper and lowercase
+          // var nameB = b.name.toUpperCase(); // ignore upper and lowercase
+          // if (nameA < nameB) {
+          //   return -1;
+          // }
+          // if (nameA > nameB) {
+          //   return 1;
+          // }
 
-          // names must be equal
-          return 0;
+          return nameLocationMap[a.name] - nameLocationMap[b.name];
         });
-      this.setState({ apiResponse, loading: false });
+
+        this.setState({ apiResponse, loading: false });
         },
         (error) => alert(JSON.stringify(error)),
         { enableHighAccuracy: false, timeout: 20000, maximumAge: 10000 },
@@ -239,7 +245,7 @@ class ViewItems extends React.Component {
               source={uri ? { uri } : require('../../assets/images/profileicon.png')}
               style={styles.itemInfoAvatar}
             />
-          <Text style={styles.itemInfoName}>{item.name} - {this.nameLocationMap[item.name]} miles away</Text>
+          <Text style={styles.itemInfoName}>{item.name} - {nameLocationMap[item.name]} miles away</Text>
           </View>
         </TouchableHighlight>
       )
