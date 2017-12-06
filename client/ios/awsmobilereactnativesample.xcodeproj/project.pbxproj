@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -559,6 +560,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		376AC1B91FD733E60047A212 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				741D7E2261874526961A63BE /* libRNFetchBlob.a */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		3E685D76BB2B4945BACD5C7D /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -688,6 +697,7 @@
 				00E356EF1AD99517003FC87E /* awsmobilereactnativesampleTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				3E685D76BB2B4945BACD5C7D /* Resources */,
+				376AC1B91FD733E60047A212 /* Recovered References */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";

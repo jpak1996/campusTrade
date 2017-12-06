@@ -10,7 +10,7 @@
  * CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-import React from 'react';
+import React, { Component } from 'react';
 import {
   View,
   ScrollView,
@@ -62,6 +62,8 @@ class ViewItems extends React.Component {
 
     this.animatedIcon = new Animated.Value(0);
 
+    this.nameLocationMap = {}
+
     this.state = {
       apiResponse: null,
       loading: true,
@@ -96,20 +98,112 @@ class ViewItems extends React.Component {
     };
 
     API.restRequest(requestParams).then(apiResponse => {
-      apiResponse.sort(function(a, b) {
-        var nameA = a.name.toUpperCase(); // ignore upper and lowercase
-        var nameB = b.name.toUpperCase(); // ignore upper and lowercase
-        if (nameA < nameB) {
-          return -1;
-        }
-        if (nameA > nameB) {
-          return 1;
-        }
 
-        // names must be equal
-        return 0;
-      });
+          /**
+           * Round number (value) to a certain number of decimals (decimals)
+           */
+          function round(value, decimals) {
+            return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+          }
+
+          /**
+           * Function to convert degrees to toRadians
+           */
+          if (Number.prototype.toRadians === undefined) {
+              Number.prototype.toRadians = function() { return this * Math.PI / 180; };
+          }
+
+          /**
+           * Creates a LatLon point on the earth's surface at the specified latitude / longitude.
+           *
+           * Parameters:
+           *  number lat - Latitude in degrees.
+           *  number lon - Longitude in degrees.
+           *
+           * Example usage:
+           *     var p1 = new LatLon(52.205, 0.119);
+           */
+          function LatLon(lat, lon) {
+              // allow instantiation without 'new'
+              if (!(this instanceof LatLon)) return new LatLon(lat, lon);
+              this.lat = Number(lat);
+              this.lon = Number(lon);
+          }
+
+
+          /**
+           * Returns the distance from ‘this’ point to destination point (using haversine formula).
+           *
+           * Parameters:
+           * LatLon: point - Latitude/longitude of destination point.
+           * number: [radius=6371e3] - (Mean) radius of earth (defaults to radius in metres).
+           *
+           * Returns:
+           * number: Distance between this point and destination point, in same units as radius.
+           *
+
+           */
+          LatLon.prototype.distanceTo = function(point, radius) {
+              if (!(point instanceof LatLon)) throw new TypeError('point is not LatLon object');
+              radius = (radius === undefined) ? 6371e3 : Number(radius);
+
+              var R = radius;
+              var φ1 = this.lat.toRadians(),  λ1 = this.lon.toRadians();
+              var φ2 = point.lat.toRadians(), λ2 = point.lon.toRadians();
+              var Δφ = φ2 - φ1;
+              var Δλ = λ2 - λ1;
+
+              var a = Math.sin(Δφ/2) * Math.sin(Δφ/2)
+                    + Math.cos(φ1) * Math.cos(φ2)
+                    * Math.sin(Δλ/2) * Math.sin(Δλ/2);
+              var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+              var d = R * c;
+              d = d * 0.621371; //Converts from kilometers to miles
+              d = d/1000;
+              if (d >= 10)
+              {
+                finald = round(d, 0);
+              } else {
+                finald = round(d, 2);
+              }
+              return finald;
+          };
+          /**
+           * EXAMPLE OF USAGE:
+           *     var p1 = new LatLon(52.205, 0.119);
+           *     var p2 = new LatLon(48.857, 2.351);
+           *     var d = p1.distanceTo(p2); // 251 mi
+           */
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          alert(position.coords.latitude)
+          alert(position.coords.longitude)
+          for (i in apiResponse) {
+            var p1 = new LatLon(34.0, -118.0);
+            var curr = new LatLon(position.coords.latitude, position.coords.longitude)
+            var d = curr.distanceTo(p1)
+            this.nameLocationMap[apiResponse[i].name] = d;
+          }
+
+        apiResponse.sort(function(a, b) {
+          var nameA = a.name.toUpperCase(); // ignore upper and lowercase
+          var nameB = b.name.toUpperCase(); // ignore upper and lowercase
+          if (nameA < nameB) {
+            return -1;
+          }
+          if (nameA > nameB) {
+            return 1;
+          }
+
+          // names must be equal
+          return 0;
+        });
       this.setState({ apiResponse, loading: false });
+        },
+        (error) => alert(JSON.stringify(error)),
+        { enableHighAccuracy: false, timeout: 20000, maximumAge: 10000 },
+      );
     }).catch(e => {
       this.setState({ apiResponse: e.message, loading: false });
     });
@@ -121,7 +215,7 @@ class ViewItems extends React.Component {
 
   toggleModal() {
     if (!this.state.modalVisible) {
-      this.handleRetrieveItem();
+      this.handleRetrieveItem(); 
       this.animate();
     }
 
@@ -145,7 +239,7 @@ class ViewItems extends React.Component {
               source={uri ? { uri } : require('../../assets/images/profileicon.png')}
               style={styles.itemInfoAvatar}
             />
-          <Text style={styles.itemInfoName}>{item.name} - {item.type}</Text>
+          <Text style={styles.itemInfoName}>{item.name} - {this.nameLocationMap[item.name]} miles away</Text>
           </View>
         </TouchableHighlight>
       )

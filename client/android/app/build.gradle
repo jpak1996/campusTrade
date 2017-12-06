@@ -93,6 +93,10 @@ android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
 
+    aaptOptions{
+        cruncherEnabled = false
+    }
+
     defaultConfig {
         applicationId "com.awsmobilereactnativesample"
         minSdkVersion 16
