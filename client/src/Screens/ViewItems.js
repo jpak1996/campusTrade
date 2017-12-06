@@ -44,7 +44,7 @@ import Auth from '../../lib/Categories/Auth';
 import Storage from '../../lib/Categories/Storage';
 import API from '../../lib/Categories/API';
 import AddItem from './AddItem';
-import ViewItem from './ViewItem';
+import ViewItemBuy from './ViewItemBuy';
 import UploadPhoto from '../Components/UploadPhoto';
 import SideMenuIcon from '../Components/SideMenuIcon';
 import awsmobile from '../../aws-exports';
@@ -228,7 +228,7 @@ class ViewItems extends React.Component {
       return (
         <TouchableHighlight
           onPress={() => {
-            this.props.navigation.navigate('ViewItem', { item })
+            this.props.navigation.navigate('ViewItemBuy', { item })
           }}
           underlayColor='transparent'
           key={item.petId}
@@ -321,7 +321,7 @@ const ViewItemsRouteStack = {
       }
     }
   },
-  ViewItem: { screen: ViewItem }
+  ViewItemBuy: { screen: ViewItemBuy }
 };
 
 const ViewItemsNav = StackNavigator(ViewItemsRouteStack);
