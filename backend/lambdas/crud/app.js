@@ -82,6 +82,34 @@ app.post('/items/pets', (req, res) => {
   });
 });
 
+app.delete('/items/pets/:petId', (req, res) => {
+  if (!req.params.petId) {
+    res.status(400).json({
+      message: 'You must specify a pet id',
+    }).end();
+    return;
+  }
+
+  const userId = req.apiGateway.event.requestContext.identity.cognitoIdentityId;
+
+  dynamoDb.delete({
+    TableName: PETS_TABLE_NAME,
+    Key: {
+      userId: userId,
+      petId: req.params.petId,
+    }
+  }, (err, data) => {
+    if (err) {
+      console.log(err)
+      res.status(500).json({
+        message: 'Could not delete pet'
+      }).end();
+    } else {
+      res.json(null);
+    }
+  });
+});
+
 app.listen(3000, function () {
   console.log('App started');
 });

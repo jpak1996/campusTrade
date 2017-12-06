@@ -29,7 +29,8 @@ import Auth from '../../lib/Categories/Auth';
 import Storage from '../../lib/Categories/Storage';
 import API from '../../lib/Categories/API';
 import AddItem from './AddItem';
-import ViewItem from './ViewItem';
+import ViewItemBuy from './ViewItemBuy';
+import ViewItemSell from './ViewItemSell';
 import UploadPhoto from '../Components/UploadPhoto';
 import SideMenuIcon from '../Components/SideMenuIcon';
 import awsmobile from '../../aws-exports';
@@ -106,7 +107,7 @@ class Sell extends React.Component {
     return (
       <TouchableHighlight
         onPress={() => {
-          this.props.navigation.navigate('ViewItem', { item })
+          this.props.navigation.navigate('ViewItemSell', { item })
         }}
         underlayColor='transparent'
         key={item.petId}
@@ -214,7 +215,7 @@ const SellRouteStack = {
       }
     }
   },
-  ViewItem: { screen: ViewItem }
+  ViewItemSell: { screen: ViewItemSell }
 };
 
 const SellNav = StackNavigator(SellRouteStack);
