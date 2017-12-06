@@ -94,7 +94,7 @@ class ViewItems extends React.Component {
     const endPoint = cloudLogicArray[0].endpoint;
     const requestParams = {
       method: 'GET',
-      url: endPoint + '/items/pets',
+      url: endPoint + '/items/pets2',
     };
 
     API.restRequest(requestParams).then(apiResponse => {
@@ -193,17 +193,8 @@ class ViewItems extends React.Component {
           }
 
           apiResponse.sort(function(a, b) {
-          // var nameA = a.name.toUpperCase(); // ignore upper and lowercase
-          // var nameB = b.name.toUpperCase(); // ignore upper and lowercase
-          // if (nameA < nameB) {
-          //   return -1;
-          // }
-          // if (nameA > nameB) {
-          //   return 1;
-          // }
-
-          return nameLocationMap[a.name] - nameLocationMap[b.name];
-        });
+            return nameLocationMap[a.name] - nameLocationMap[b.name];
+          });
 
         this.setState({ apiResponse, loading: false });
         },
